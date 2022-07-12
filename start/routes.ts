@@ -23,16 +23,18 @@ import Route from '@ioc:Adonis/Core/Route'
 // Route.resource('users', 'UsersController').apiOnly() //
 // Route.get('users', 'UsersController').apiOnly() //
 
-Route.where('id', Route.matchers.uuid())
+Route.where('id', /^[a-z0-9]{25}$/)
 
 Route.group(() => {
   Route.group(() => {
     Route.get('/health', 'HealthController.index')
 
-    Route.group(() => {
-      Route.get('/', 'AuthController.index')
-    }).prefix('/auth')
+    Route.get('/auth', 'AuthController.index')
+    Route.get('/logout', 'AuthController.logout')
 
-    Route.resource('users', 'UserController')
+    Route.group(() => {
+      Route.resource('users', 'UsersController').apiOnly()
+    })
+    //.middleware('auth:api')
   }).prefix('/v1')
 }).prefix('/api')
