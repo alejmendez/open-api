@@ -29,7 +29,7 @@ Route.group(() => {
   Route.group(() => {
     Route.get('/health', 'HealthController.index')
 
-    Route.get('/auth', 'AuthController.index')
+    Route.post('/auth', 'AuthController.index')
     Route.get('/logout', 'AuthController.logout')
 
     Route.group(() => {
