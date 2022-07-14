@@ -1,55 +1,46 @@
+import UserService from 'App/Services/UsersService'
 import CreateUserValidator from 'App/Validators/CreateUserValidator'
-import {
-  createUser,
-  destroyUser,
-  getOneUser,
-  paginatedListUser,
-  updateUser,
-} from 'App/Services/UsersService'
 import UpdateUserValidator from 'App/Validators/UpdateUserValidator'
 
 export default class UsersController {
+  protected userService
+  constructor() {
+    this.userService = new UserService()
+  }
+
   public async index({ request }) {
     const page = request.input('page', 1)
     const limit = request.input('limit', 10)
 
-    const users = await paginatedListUser(page, limit)
+    const users = await this.userService.paginatedList(page, limit)
 
     return users.toJSON()
   }
 
   public async show({ params }) {
     const { id } = params
-    const user = await getOneUser(id)
+    const user = await this.userService.getOne(id)
     return user
   }
 
   public async store({ request, response }) {
-    try {
-      const payload = await request.validate(CreateUserValidator)
-      const user = await createUser(payload)
+    const payload = await request.validate(CreateUserValidator)
+    const user = await this.userService.create(payload)
 
-      return response.status(201).send({ user })
-    } catch (error) {
-      response.badRequest(error.messages)
-    }
+    return response.status(201).send(user)
   }
 
   public async update({ request, response, params }) {
-    try {
-      const { id } = params
-      const payload = await request.validate(UpdateUserValidator)
-      const user = await updateUser(id, payload)
+    const { id } = params
+    const payload = await request.validate(UpdateUserValidator)
+    const user = await this.userService.update(id, payload)
 
-      return response.send({ user })
-    } catch (error) {
-      response.badRequest(error.messages)
-    }
+    return response.send(user)
   }
 
   public async destroy({ response, params }) {
     const { id } = params
-    destroyUser(id)
+    await this.userService.delete(id)
     return response.status(204).send(null)
   }
 }

@@ -1,22 +1,43 @@
 import Hash from '@ioc:Adonis/Core/Hash'
 import User from 'App/Models/User'
 
-const authenticate = async (auth, email: string, password: string) => {
-  const user = await User.query().where('email', email).firstOrFail()
+interface Authentication {
+  isAuthenticated: boolean
+  user: User
+  token: any
+}
 
-  if (!(await Hash.verify(user.password, password))) {
-    return false
+const authenticate = async (auth, email: string, password: string) => {
+  const user = await User.query().where('email', email.toLowerCase()).firstOrFail()
+  const isVerified = await Hash.verify(user.password, password)
+
+  const authenticated: Authentication = {
+    isAuthenticated: isVerified,
+    user,
+    token: {},
   }
 
-  const token = await auth.use('api').generate(user)
+  if (!authenticated.isAuthenticated) {
+    return authenticated
+  }
+
+  authenticated.token = await auth.use('jwt').generate(user, {
+    payload: {
+      email: user.email,
+    },
+  })
+
+  return authenticated
+}
+
+const refresh = async (auth, refreshToken) => {
+  const token = await auth.use('jwt').loginViaRefreshToken(refreshToken)
   return token
 }
 
 const logout = async (auth) => {
-  await auth.use('api').revoke()
-  return {
-    revoked: true,
-  }
+  await auth.use('jwt').revoke()
+  return true
 }
 
-export { authenticate, logout }
+export { authenticate, refresh, logout }

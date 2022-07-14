@@ -1,27 +1,26 @@
 import User from 'App/Models/User'
 
-const paginatedListUser = async (page, limit) => {
-  const users = await User.query().select('id', 'username', 'email').paginate(page, limit)
-  return users
-}
+export default class UserService {
+  public async paginatedList(page, limit) {
+    const users = await User.query().select('id', 'username', 'email').paginate(page, limit)
+    return users
+  }
 
-const getOneUser = async (id) => {
-  return await User.findOrFail(id)
-}
+  public async getOne(id) {
+    return await User.findOrFail(id)
+  }
 
-const createUser = async (data) => {
-  const user = await User.create(data)
-  return user
-}
+  public async create(data) {
+    return await User.create(data)
+  }
 
-const updateUser = async (id, data) => {
-  const user = await getOneUser(id)
-  return await user.merge(data).save()
-}
+  public async update(id, data) {
+    const user = await this.getOne(id)
+    return await user.merge(data).save()
+  }
 
-const destroyUser = async (id) => {
-  const user = await getOneUser(id)
-  return user.delete()
+  public async delete(id) {
+    const user = await this.getOne(id)
+    return await user.delete()
+  }
 }
-
-export { paginatedListUser, getOneUser, createUser, updateUser, destroyUser }

@@ -1,19 +1,29 @@
-import { authenticate, logout } from 'App/Services/AuthService'
+import { authenticate, refresh, logout } from 'App/Services/AuthService'
+import AuthUserValidator from 'App/Validators/AuthUserValidator'
 
 export default class AuthController {
   public async index({ request, response, auth }) {
-    const email = request.input('email')
-    const password = request.input('password')
+    const payload = await request.validate(AuthUserValidator)
 
-    const token = authenticate(auth, email, password)
-    if (!token) {
+    const authenticated = await authenticate(auth, payload.email, payload.password)
+    if (!authenticated.isAuthenticated) {
       return response.unauthorized('Invalid credentials')
     }
 
-    return token
+    return {
+      token: authenticated.token,
+      user: authenticated.user,
+    }
+  }
+
+  public async refresh({ auth, request }) {
+    const refreshToken = request.input('refresh_token')
+    return refresh(auth, refreshToken)
   }
 
   public async logout({ auth }) {
-    return logout(auth)
+    return {
+      revoked: logout(auth),
+    }
   }
 }
