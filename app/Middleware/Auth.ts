@@ -1,6 +1,7 @@
 import { GuardsList } from '@ioc:Adonis/Addons/Auth'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { AuthenticationException } from '@adonisjs/auth/build/standalone'
+import Application from '@ioc:Adonis/Core/Application'
 
 /**
  * Auth middleware is meant to restrict un-authenticated access to a given route
@@ -69,6 +70,9 @@ export default class AuthMiddleware {
      * Uses the user defined guards or the default guard mentioned in
      * the config file
      */
+    if (Application.nodeEnvironment === 'test') {
+      return await next()
+    }
     const guards = customGuards.length ? customGuards : [auth.name]
     await this.authenticate(auth, guards)
     await next()

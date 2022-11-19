@@ -1,7 +1,7 @@
 import { test } from '@japa/runner'
 
 test('Health check', async ({ client }) => {
-  const response = await client.get('/api/v1/health')
+  const response = await client.get('/api/health')
 
   response.assertStatus(200)
   response.assertBodyContains({

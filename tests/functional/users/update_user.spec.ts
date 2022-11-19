@@ -2,7 +2,7 @@ import { test } from '@japa/runner'
 import Database from '@ioc:Adonis/Lucid/Database'
 import UserFactory from 'Database/factories/UserFactory'
 
-test.group('Users update end point /api/v1/users', (group) => {
+test.group('Users update end point /api/users', (group) => {
   group.tap((test) => test.tags(['@users', '@update']))
   group.each.setup(async () => {
     await Database.from('users').delete()
@@ -16,7 +16,7 @@ test.group('Users update end point /api/v1/users', (group) => {
       password: '123456',
     }
 
-    const response = await client.put(`/api/v1/users/${user.id}`).json(data)
+    const response = await client.put(`/api/users/${user.id}`).json(data)
     response.assertStatus(200)
     response.assertBodyContains({
       id: user.id,

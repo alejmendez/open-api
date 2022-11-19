@@ -2,7 +2,7 @@ import { test } from '@japa/runner'
 import Database from '@ioc:Adonis/Lucid/Database'
 import UserFactory from 'Database/factories/UserFactory'
 
-test.group('Auth end point /api/v1/auth', (group) => {
+test.group('Auth end point /api/auth', (group) => {
   group.tap((test) => test.tags(['@auth']))
 
   group.each.setup(async () => {
@@ -13,7 +13,7 @@ test.group('Auth end point /api/v1/auth', (group) => {
     const userPassword = '12345678'
     const user = await UserFactory.merge({ password: userPassword }).create()
 
-    const response = await client.post('/api/v1/auth').form({
+    const response = await client.post('/api/auth').form({
       email: user.email,
       password: userPassword,
     })

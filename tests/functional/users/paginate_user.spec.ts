@@ -2,14 +2,14 @@ import { test } from '@japa/runner'
 import Database from '@ioc:Adonis/Lucid/Database'
 import UserFactory from 'Database/factories/UserFactory'
 
-test.group('Users paginate end point /api/v1/users', (group) => {
+test.group('Users paginate end point /api/users', (group) => {
   group.tap((test) => test.tags(['@users', '@paginate']))
   group.each.setup(async () => {
     await Database.from('users').delete()
   })
 
   test('should return an empty list', async ({ client }) => {
-    const response = await client.get('/api/v1/users')
+    const response = await client.get('/api/users')
     response.assertStatus(200)
     response.assertBodyContains({
       meta: {
@@ -29,7 +29,7 @@ test.group('Users paginate end point /api/v1/users', (group) => {
 
   test('should return a list of 10 users', async ({ client }) => {
     const users = await UserFactory.createMany(10)
-    const response = await client.get('/api/v1/users')
+    const response = await client.get('/api/users')
     response.assertStatus(200)
     const dataExpected = users.map((user) => {
       const { id, username, email } = user
